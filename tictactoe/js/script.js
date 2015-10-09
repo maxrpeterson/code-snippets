@@ -41,7 +41,15 @@ var Game = (function() {
 		if (!this.cells[pos]) {
 			return false;
 		} else {
-			return this.cells[pos].setState(this.currentPlayer);
+			if (this.cells[pos].setState(this.currentPlayer)) {
+				if (this.currentPlayer === x) {
+					this.currentPlayer = o;
+				} else {
+					this.currentPlayer = x;
+				}
+				return true;
+			}
+
 		}
 	};
 	Board.prototype.checkWin = function() {
@@ -49,10 +57,20 @@ var Game = (function() {
 	};
 
 	return {
-		makeBoard: function(container) {
+		start: function(container) {
 			board = new Board(container);
+			board.container.addEventListener('click', function(e) {
+				if(e.target.tagName === 'DIV' && e.target.className === 'cell') {
+					this.play(parseInt(e.target.id));
+				}
+			});
+			board.startGame();
 		},
-		
+		play: function(pos) {
+			board.makePlay(pos);
+		}
 	}
 
 })();
+
+Game.start(document.querySelector('main.board'));
