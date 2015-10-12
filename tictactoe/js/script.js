@@ -2,13 +2,14 @@ var Game = (function() {
 	var x = 'X', o = 'O', board;
 	// Cell constructor
 	function Cell(domElem) {
-		this.value = '';
+		this.value = null;
 		this.domElem = domElem;
 	}
 	// Cell instance methods
 	Cell.prototype.setState = function(plyr) {
 		if (this.playable()) {
 			this.value = plyr;
+			// set its own DOM node text content
 			this.domElem.textContent = plyr;
 			return true;
 		} else {
@@ -16,23 +17,26 @@ var Game = (function() {
 		}
 	};
 	Cell.prototype.playable = function() {
-		return this.value === '';
+		return !this.value;
 	};
 
 	// Board Constructor
 	function Board(container) {
 		this.container = container;
 		this.cells = [];
-		this.currentPlayer = '';
+		this.currentPlayer = null;
+		this.isOver = false;
+		this.winner = null;
 	}
 	// Board instance methods
 	Board.prototype.startGame = function() {
 		this.container.innerHTML = '';
 		// create each cell div and append to the board container
 		for(var i = 0; i < 9; i++) {
-			var cellElem = document.createElement("div");
+			var cellElem = document.createElement('div');
 			cellElem.id = i;
-			cellElem.classList.add("cell");
+			cellElem.classList.add('cell');
+			// passing the element to the cell allows it to update its own dom node
 			this.container.appendChild(cellElem);
 			this.cells.push(new Cell(cellElem));
 		}
@@ -40,24 +44,69 @@ var Game = (function() {
 		return this;
 	};
 	Board.prototype.makePlay = function(pos) {
+		// error handling in case pos is outside the cells array
 		if (!this.cells[pos]) {
 			return false;
 		} else {
 			if (this.cells[pos].setState(this.currentPlayer)) {
-				// change the current player after making a move
-				if (this.currentPlayer === x) {
-					this.currentPlayer = o;
+				if (this.checkWin()) {
+					return this.isOver;
 				} else {
-					this.currentPlayer = x;
+					// change the current player after making a move
+					if (this.currentPlayer === x) {
+						this.currentPlayer = o;
+					} else {
+						this.currentPlayer = x;
+					}
+					return this.currentPlayer;
 				}
-				return this.checkWin();
+			} else {
+				return false;
 			}
-
 		}
+	};
+	// this can be called a bunch of times for any win case
+	Board.prototype.winStatus = function() {
+		console.log('someone won');
+		this.isOver	= true;
+		this.winner = this.currentPlayer;
+		return true;
+	};
+	// check the across & down values since they're always gonna be the same '+' pattern
+	Board.prototype.checkAcross = function(start) {
+		return this.cells[start].value && this.cells[start].value === this.cells[start + 1].value && this.cells[start + 1].value === this.cells[start + 2].value;
+	};
+	Board.prototype.checkDown = function(start) {
+		return this.cells[start].value && this.cells[start].value === this.cells[start + 3].value && this.cells[start + 3].value === this.cells[start + 6].value;
 	};
 	Board.prototype.checkWin = function() {
 		// figure this out
 		// return status of game if won, current player if not yet over?
+		for (var i = 0; i < this.cells.length; i++) {
+			if (i === 0) {
+				var across = this.checkAcross(i);
+				var down = this.checkDown(i);
+				var diag = this.cells[i].value && this.cells[i].value === this.cells[i + 4].value && this.cells[i + 4].value === this.cells[i + 8].value;
+				if (across || down || diag) {
+					return this.winStatus();
+				}
+			} else if (i === 1) {
+				if (this.checkDown(i)) {
+					return this.winStatus();
+				}
+			} else if (i === 2) {
+				var down = this.checkDown(i);
+				var diag = this.cells[i].value && this.cells[i].value === this.cells[i + 2].value && this.cells[i + 2].value === this.cells[i + 4].value;
+				if (down || diag) {
+					return this.winStatus();
+				}
+			} else if (i === 3 || i === 6) {
+				if (this.checkAcross(i)) {
+					return this.winStatus();
+				}
+			}
+		}
+		return false;
 	};
 
 	return {
@@ -66,14 +115,19 @@ var Game = (function() {
 			board.container.addEventListener('click', function(e) {
 				if(e.target.tagName === 'DIV' && e.target.className === 'cell') {
 					this.play(parseInt(e.target.id));
-					console.log(e);
 				}
 			}.bind(this));
 			board.startGame();
 		},
 		play: function(pos) {
 			board.makePlay(pos);
-			return board.currentPlayer; // this should actually return from board.checkwin()??
+			if (board.isOver) {
+				console.log(board.isOver, board.winner);
+				return board.winner;
+			}
+		},
+		status: function() {
+			return board;
 		}
 	}
 
