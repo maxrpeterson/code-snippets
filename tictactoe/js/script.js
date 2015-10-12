@@ -82,7 +82,9 @@ var Game = (function() {
 	Board.prototype.checkWin = function() {
 		// figure this out
 		// return status of game if won, current player if not yet over?
+		var anyPlayable = false;
 		for (var i = 0; i < this.cells.length; i++) {
+			if (!this.cells[i].value) {anyPlayable = true;}
 			if (i === 0) {
 				var across = this.checkAcross(i);
 				var down = this.checkDown(i);
@@ -106,7 +108,12 @@ var Game = (function() {
 				}
 			}
 		}
-		return false;
+		if (anyPlayable) {
+			return false;
+		} else {
+			this.isOver = true;
+			return true;
+		}
 	};
 
 	return {
