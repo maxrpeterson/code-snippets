@@ -145,9 +145,6 @@ var Game = (function() {
 				};
 				return board.winner;
 			}
-		},
-		status: function() {
-			return board;
 		}
 	}
 
