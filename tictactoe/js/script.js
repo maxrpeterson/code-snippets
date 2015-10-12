@@ -130,12 +130,11 @@ var Game = (function() {
 		play: function(pos) {
 			board.makePlay(pos);
 			if (board.isOver) {
-				console.log(board.isOver, board.winner);
 				var winner = board.winner || 'Nobody';
 				board.container.innerHTML = (
 				'<div class="gameover-message">' +
 					'<div>Game Over!</div>' + 
-					'<div class="player">' + winner + '</div>' +
+					'<div class="player">' + winner.toUpperCase() + '</div>' +
 					'<div>won!</div>' +
 				'</div>'
 				);
