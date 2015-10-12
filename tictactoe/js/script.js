@@ -6,9 +6,10 @@ var Game = (function() {
 		this.domElem = domElem;
 	}
 	// Cell instance methods
-	Cell.prototype.setState = function(val) {
+	Cell.prototype.setState = function(plyr) {
 		if (this.playable()) {
-			this.value = val;
+			this.value = plyr;
+			this.domElem.textContent = plyr;
 			return true;
 		} else {
 			return false;
@@ -27,6 +28,7 @@ var Game = (function() {
 	// Board instance methods
 	Board.prototype.startGame = function() {
 		this.container.innerHTML = '';
+		// create each cell div and append to the board container
 		for(var i = 0; i < 9; i++) {
 			var cellElem = document.createElement("div");
 			cellElem.id = i;
@@ -42,18 +44,20 @@ var Game = (function() {
 			return false;
 		} else {
 			if (this.cells[pos].setState(this.currentPlayer)) {
+				// change the current player after making a move
 				if (this.currentPlayer === x) {
 					this.currentPlayer = o;
 				} else {
 					this.currentPlayer = x;
 				}
-				return true;
+				return this.checkWin();
 			}
 
 		}
 	};
 	Board.prototype.checkWin = function() {
 		// figure this out
+		// return status of game if won, current player if not yet over?
 	};
 
 	return {
@@ -62,15 +66,17 @@ var Game = (function() {
 			board.container.addEventListener('click', function(e) {
 				if(e.target.tagName === 'DIV' && e.target.className === 'cell') {
 					this.play(parseInt(e.target.id));
+					console.log(e);
 				}
-			});
+			}.bind(this));
 			board.startGame();
 		},
 		play: function(pos) {
 			board.makePlay(pos);
+			return board.currentPlayer; // this should actually return from board.checkwin()??
 		}
 	}
 
 })();
 
-Game.start(document.querySelector('main.board'));
+Game.start(document.querySelector('div.board'));

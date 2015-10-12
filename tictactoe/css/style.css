@@ -1,0 +1,60 @@
+body {
+	background: white;
+	font-size: 14px;
+}
+
+.container {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.board {
+	box-sizing: border-box;
+	width: 40vw;
+	height: 40vw;
+	border: 1px solid lightgrey;
+	margin: 0 auto;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	-webkit-transform: translateY(-50%);
+	-moz-transform: translateY(-50%);
+	-o-transform: translateY(-50%);
+	transform: translateY(-50%);
+}
+
+.cell {
+	border: 1px solid black;
+	width: 24%;
+	height: 24%;
+	cursor: pointer;
+	display: inline-block;
+	vertical-align: top;
+	margin: 4.5%;
+	font-size: 2em;
+	box-sizing: border-box;
+	text-align: center;
+	line-height: 100%;
+}
+
+.cell:hover {
+	background: lightgrey;
+}
+
+@media (max-width: 800px) {
+	.board {
+		width: 60vw;
+		height: 60vw;
+	}
+}
+
+@media (max-width: 500px) {
+	.board {
+		width: 75vw;
+		height: 75vw;
+	}
+}
