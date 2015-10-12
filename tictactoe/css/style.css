@@ -45,6 +45,15 @@ body {
 	background: lightgrey;
 }
 
+.gameover-message {
+	font-size: 4em;
+	text-align: center;
+}
+
+.gameover-message .player {
+	font-size: 2em;
+}
+
 @media (max-width: 800px) {
 	.board {
 		width: 60vw;

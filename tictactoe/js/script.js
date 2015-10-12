@@ -67,7 +67,6 @@ var Game = (function() {
 	};
 	// this can be called a bunch of times for any win case
 	Board.prototype.winStatus = function() {
-		console.log('someone won');
 		this.isOver	= true;
 		this.winner = this.currentPlayer;
 		return true;
@@ -80,11 +79,10 @@ var Game = (function() {
 		return this.cells[start].value && this.cells[start].value === this.cells[start + 3].value && this.cells[start + 3].value === this.cells[start + 6].value;
 	};
 	Board.prototype.checkWin = function() {
-		// figure this out
-		// return status of game if won, current player if not yet over?
+		// anyPlayable will be changed to true if any still have null value
 		var anyPlayable = false;
 		for (var i = 0; i < this.cells.length; i++) {
-			if (!this.cells[i].value) {anyPlayable = true;}
+			if (this.cells[i].playable()) {anyPlayable = true;}
 			if (i === 0) {
 				var across = this.checkAcross(i);
 				var down = this.checkDown(i);
@@ -109,8 +107,10 @@ var Game = (function() {
 			}
 		}
 		if (anyPlayable) {
+			// game is not yet over
 			return false;
 		} else {
+			// tie game, none left to play
 			this.isOver = true;
 			return true;
 		}
@@ -119,6 +119,7 @@ var Game = (function() {
 	return {
 		start: function(container) {
 			board = new Board(container);
+			board.container.onclick = null;
 			board.container.addEventListener('click', function(e) {
 				if(e.target.tagName === 'DIV' && e.target.className === 'cell') {
 					this.play(parseInt(e.target.id));
@@ -130,6 +131,18 @@ var Game = (function() {
 			board.makePlay(pos);
 			if (board.isOver) {
 				console.log(board.isOver, board.winner);
+				var winner = board.winner || 'Nobody';
+				board.container.innerHTML = (
+				'<div class="gameover-message">' +
+					'<div>Game Over!</div>' + 
+					'<div class="player">' + winner + '</div>' +
+					'<div>won!</div>' +
+				'</div>'
+				);
+				var self = this;
+				board.container.onclick = function(e) {
+					self.start(e.currentTarget);
+				};
 				return board.winner;
 			}
 		},
